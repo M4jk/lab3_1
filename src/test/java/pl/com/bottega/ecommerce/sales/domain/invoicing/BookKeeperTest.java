@@ -125,4 +125,24 @@ public class BookKeeperTest {
         Assert.assertThat(invoice.getItems().get(0).getProduct().getType(), is(ProductType.STANDARD));
     }
 
+    @Test
+    public void behaviourTestRequestInvoiceCallingGetProductDataTwoTimes() {
+        taxPolicy = mock(TaxPolicy.class);
+        productData = mock(ProductData.class);
+        requestItem = mock(RequestItem.class);
+
+        invoiceRequest.add(requestItem);
+
+        when(productData.getType()).thenReturn(ProductType.STANDARD);
+        when(requestItem.getProductData()).thenReturn(productData);
+        when(requestItem.getQuantity()).thenReturn(1);
+        when(requestItem.getTotalCost()).thenReturn(new Money(100));
+
+        when(taxPolicy.calculateTax(ProductType.STANDARD, new Money(100))).thenReturn(new Tax(new Money(100), "tax"));
+
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
+
+        verify(requestItem, times(2)).getProductData();
+    }
+
 }
