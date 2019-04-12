@@ -70,4 +70,23 @@ public class BookKeeperTest {
         verify(taxPolicy, times(2)).calculateTax(ProductType.STANDARD, new Money(100));
     }
 
+    @Test
+    public void stateTestInvoiceGetNet() {
+        taxPolicy = mock(TaxPolicy.class);
+        productData = mock(ProductData.class);
+        requestItem = new RequestItem(productData, 1, new Money(100));
+
+        invoiceRequest.add(requestItem);
+        invoiceRequest.add(requestItem);
+        invoiceRequest.add(requestItem);
+
+        when(productData.getType()).thenReturn(ProductType.STANDARD);
+        when(taxPolicy.calculateTax(ProductType.STANDARD, new Money(100))).thenReturn(new Tax(new Money(100), "tax"));
+
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
+        Money resultMoney = invoice.getNet();
+
+        Assert.assertThat(resultMoney, is(new Money(300)));
+    }
+
 }
