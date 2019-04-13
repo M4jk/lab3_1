@@ -1,8 +1,8 @@
 package pl.com.bottega.ecommerce.sales.application.api.handler;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.ClientData;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.Id;
 import pl.com.bottega.ecommerce.sales.application.api.command.AddProductCommand;
 import pl.com.bottega.ecommerce.sales.domain.client.ClientRepository;
@@ -15,8 +15,7 @@ import pl.com.bottega.ecommerce.sales.domain.reservation.ReservationRepository;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
 import pl.com.bottega.ecommerce.system.application.SystemContext;
 
-import java.util.Date;
-
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
 public class AddProductCommandHandlerTest {
@@ -64,6 +63,22 @@ public class AddProductCommandHandlerTest {
         addProductCommandHandler.handle(addProductCommand);
 
         verify(reservationRepository, times(3)).load(addProductCommand.getOrderId());
+    }
+
+    @Test
+    public void testProductIsAvailable() {
+        Assert.assertThat(product.isAvailable(), is(true));
+    }
+
+    @Test
+    public void testReservationStatus() {
+        when(productRepository.load(addProductCommand.getProductId())).thenReturn(product);
+        when(reservation.getStatus()).thenReturn(Reservation.ReservationStatus.OPENED);
+        when(reservationRepository.load(addProductCommand.getOrderId())).thenReturn(reservation);
+
+        addProductCommandHandler.handle(addProductCommand);
+
+        Assert.assertThat(reservation.getStatus(), is(Reservation.ReservationStatus.OPENED));
     }
 
 }
