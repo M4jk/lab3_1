@@ -50,7 +50,7 @@ public class AddProductCommandHandlerTest {
 
         addProductCommandHandler.handle(addProductCommand);
 
-        verify(reservationRepository, times(1)).load(addProductCommand.getOrderId());
+        verify(productRepository, times(1)).load(addProductCommand.getProductId());
     }
 
     @Test
