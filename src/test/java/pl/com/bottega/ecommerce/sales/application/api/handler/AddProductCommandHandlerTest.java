@@ -28,6 +28,8 @@ public class AddProductCommandHandlerTest {
     private SystemContext systemContext;
     private AddProductCommandHandler addProductCommandHandler;
     private Reservation reservation;
+    private AddProductCommand addProductCommand;
+    private Product product;
 
     @Before
     public void initialize() {
@@ -37,25 +39,31 @@ public class AddProductCommandHandlerTest {
         clientRepository = mock(ClientRepository.class);
         systemContext = new SystemContext();
         addProductCommandHandler = new AddProductCommandHandler(reservationRepository, productRepository, suggestionService, clientRepository, systemContext);
+        reservation = mock(Reservation.class);
+        addProductCommand = new AddProductCommand(Id.generate(), Id.generate(), 1);
+        product = new Product(Id.generate(), new Money(100), "product", ProductType.STANDARD);
     }
 
     @Test
     public void testHandleShouldCallProductRepositoryLoadOneTime() {
-        AddProductCommand addProductCommand = new AddProductCommand(Id.generate(), Id.generate(), 1);
-        Product product = new Product(Id.generate(), new Money(100), "product", ProductType.STANDARD);
-        reservation = mock(Reservation.class);
-
-        when(reservation.getStatus()).thenReturn(Reservation.ReservationStatus.OPENED);
-        when(reservation.isClosed()).thenReturn(false);
-        when(reservation.getClientData()).thenReturn(new ClientData(Id.generate(), "client"));
-        when(reservation.getCreateDate()).thenReturn(new Date());
-
         when(productRepository.load(addProductCommand.getProductId())).thenReturn(product);
         when(reservationRepository.load(addProductCommand.getOrderId())).thenReturn(reservation);
 
         addProductCommandHandler.handle(addProductCommand);
 
         verify(reservationRepository, times(1)).load(addProductCommand.getOrderId());
+    }
+
+    @Test
+    public void testHandleShouldCallReservationRepositoryLoadThreeTimes() {
+        when(productRepository.load(addProductCommand.getProductId())).thenReturn(product);
+        when(reservationRepository.load(addProductCommand.getOrderId())).thenReturn(reservation);
+
+        addProductCommandHandler.handle(addProductCommand);
+        addProductCommandHandler.handle(addProductCommand);
+        addProductCommandHandler.handle(addProductCommand);
+
+        verify(reservationRepository, times(3)).load(addProductCommand.getOrderId());
     }
 
 }
