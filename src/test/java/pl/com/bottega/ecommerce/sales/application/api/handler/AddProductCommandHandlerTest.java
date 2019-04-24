@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.Id;
 import pl.com.bottega.ecommerce.sales.application.api.command.AddProductCommand;
+import pl.com.bottega.ecommerce.sales.application.api.command.AddProductCommandBuilder;
 import pl.com.bottega.ecommerce.sales.domain.client.ClientRepository;
 import pl.com.bottega.ecommerce.sales.domain.equivalent.SuggestionService;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.Product;
@@ -48,7 +49,12 @@ public class AddProductCommandHandlerTest {
         addProductCommandHandler = addProductCommandHandlerBuilder.build();
 
         reservation = mock(Reservation.class);
-        addProductCommand = new AddProductCommand(Id.generate(), Id.generate(), 1);
+
+        AddProductCommandBuilder addProductCommandBuilder = new AddProductCommandBuilder();
+        addProductCommandBuilder.withOrderId(Id.generate())
+                                .withProductId(Id.generate())
+                                .withQuantity(1);
+        addProductCommand = addProductCommandBuilder.build();
 
         ProductBuilder productBuilder = new ProductBuilder();
         productBuilder.withProductId(Id.generate())
