@@ -8,6 +8,7 @@ import pl.com.bottega.ecommerce.sales.application.api.command.AddProductCommand;
 import pl.com.bottega.ecommerce.sales.domain.client.ClientRepository;
 import pl.com.bottega.ecommerce.sales.domain.equivalent.SuggestionService;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.Product;
+import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductBuilder;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductRepository;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType;
 import pl.com.bottega.ecommerce.sales.domain.reservation.Reservation;
@@ -48,7 +49,13 @@ public class AddProductCommandHandlerTest {
 
         reservation = mock(Reservation.class);
         addProductCommand = new AddProductCommand(Id.generate(), Id.generate(), 1);
-        product = new Product(Id.generate(), new Money(100), "product", ProductType.STANDARD);
+
+        ProductBuilder productBuilder = new ProductBuilder();
+        productBuilder.withProductId(Id.generate())
+                      .withPrice(new Money(100))
+                      .withName("product")
+                      .withProductType(ProductType.STANDARD);
+        product = productBuilder.build();
     }
 
     @Test
