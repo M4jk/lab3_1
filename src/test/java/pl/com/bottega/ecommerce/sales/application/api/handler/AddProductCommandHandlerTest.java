@@ -37,7 +37,15 @@ public class AddProductCommandHandlerTest {
         suggestionService = mock(SuggestionService.class);
         clientRepository = mock(ClientRepository.class);
         systemContext = new SystemContext();
-        addProductCommandHandler = new AddProductCommandHandler(reservationRepository, productRepository, suggestionService, clientRepository, systemContext);
+
+        AddProductCommandHandlerBuilder addProductCommandHandlerBuilder = new AddProductCommandHandlerBuilder();
+        addProductCommandHandlerBuilder.withReservationRepository(reservationRepository)
+                                       .withProductRepository(productRepository)
+                                       .withSuggestionService(suggestionService)
+                                       .withClientRepository(clientRepository)
+                                       .withSystemContext(systemContext);
+        addProductCommandHandler = addProductCommandHandlerBuilder.build();
+
         reservation = mock(Reservation.class);
         addProductCommand = new AddProductCommand(Id.generate(), Id.generate(), 1);
         product = new Product(Id.generate(), new Money(100), "product", ProductType.STANDARD);
