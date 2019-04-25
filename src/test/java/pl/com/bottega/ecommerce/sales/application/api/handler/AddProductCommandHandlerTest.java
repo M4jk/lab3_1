@@ -3,6 +3,7 @@ package pl.com.bottega.ecommerce.sales.application.api.handler;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.ClientData;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.Id;
 import pl.com.bottega.ecommerce.sales.application.api.command.AddProductCommand;
 import pl.com.bottega.ecommerce.sales.domain.client.ClientRepository;
@@ -14,6 +15,8 @@ import pl.com.bottega.ecommerce.sales.domain.reservation.Reservation;
 import pl.com.bottega.ecommerce.sales.domain.reservation.ReservationRepository;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
 import pl.com.bottega.ecommerce.system.application.SystemContext;
+
+import java.util.Date;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
@@ -37,8 +40,10 @@ public class AddProductCommandHandlerTest {
         suggestionService = mock(SuggestionService.class);
         clientRepository = mock(ClientRepository.class);
         systemContext = new SystemContext();
-        addProductCommandHandler = new AddProductCommandHandler(reservationRepository, productRepository, suggestionService, clientRepository, systemContext);
-        reservation = mock(Reservation.class);
+        addProductCommandHandler = new AddProductCommandHandler(reservationRepository, productRepository, suggestionService,
+                clientRepository, systemContext);
+        reservation = new Reservation(Id.generate(), Reservation.ReservationStatus.OPENED, new ClientData(Id.generate(), "name"),
+                new Date());
         addProductCommand = new AddProductCommand(Id.generate(), Id.generate(), 1);
         product = new Product(Id.generate(), new Money(100), "product", ProductType.STANDARD);
     }
@@ -73,7 +78,6 @@ public class AddProductCommandHandlerTest {
     @Test
     public void testReservationStatus() {
         when(productRepository.load(addProductCommand.getProductId())).thenReturn(product);
-        when(reservation.getStatus()).thenReturn(Reservation.ReservationStatus.OPENED);
         when(reservationRepository.load(addProductCommand.getOrderId())).thenReturn(reservation);
 
         addProductCommandHandler.handle(addProductCommand);
