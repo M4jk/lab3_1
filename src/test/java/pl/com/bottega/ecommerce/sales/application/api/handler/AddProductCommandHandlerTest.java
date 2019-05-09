@@ -14,6 +14,7 @@ import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductBuilder;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductRepository;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType;
 import pl.com.bottega.ecommerce.sales.domain.reservation.Reservation;
+import pl.com.bottega.ecommerce.sales.domain.reservation.ReservationBuilder;
 import pl.com.bottega.ecommerce.sales.domain.reservation.ReservationRepository;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
 import pl.com.bottega.ecommerce.system.application.SystemContext;
@@ -51,8 +52,12 @@ public class AddProductCommandHandlerTest {
                                        .withSystemContext(systemContext);
         addProductCommandHandler = addProductCommandHandlerBuilder.build();
 
-        reservation = new Reservation(Id.generate(), Reservation.ReservationStatus.OPENED, new ClientData(Id.generate(), "name"),
-                new Date());
+        ReservationBuilder reservationBuilder = new ReservationBuilder();
+        reservationBuilder.withAggregateId(Id.generate())
+                          .withReservationStatus(Reservation.ReservationStatus.OPENED)
+                          .withClientData(new ClientData(Id.generate(), "name"))
+                          .withDate(new Date());
+        reservation = reservationBuilder.build();
 
         AddProductCommandBuilder addProductCommandBuilder = new AddProductCommandBuilder();
         addProductCommandBuilder.withOrderId(Id.generate())
