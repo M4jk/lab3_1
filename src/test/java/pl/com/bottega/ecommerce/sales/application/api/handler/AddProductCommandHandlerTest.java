@@ -3,6 +3,7 @@ package pl.com.bottega.ecommerce.sales.application.api.handler;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.ClientData;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.Id;
 import pl.com.bottega.ecommerce.sales.application.api.command.AddProductCommand;
 import pl.com.bottega.ecommerce.sales.application.api.command.AddProductCommandBuilder;
@@ -16,6 +17,8 @@ import pl.com.bottega.ecommerce.sales.domain.reservation.Reservation;
 import pl.com.bottega.ecommerce.sales.domain.reservation.ReservationRepository;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
 import pl.com.bottega.ecommerce.system.application.SystemContext;
+
+import java.util.Date;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
@@ -48,7 +51,8 @@ public class AddProductCommandHandlerTest {
                                        .withSystemContext(systemContext);
         addProductCommandHandler = addProductCommandHandlerBuilder.build();
 
-        reservation = mock(Reservation.class);
+        reservation = new Reservation(Id.generate(), Reservation.ReservationStatus.OPENED, new ClientData(Id.generate(), "name"),
+                new Date());
 
         AddProductCommandBuilder addProductCommandBuilder = new AddProductCommandBuilder();
         addProductCommandBuilder.withOrderId(Id.generate())
@@ -94,7 +98,6 @@ public class AddProductCommandHandlerTest {
     @Test
     public void testReservationStatus() {
         when(productRepository.load(addProductCommand.getProductId())).thenReturn(product);
-        when(reservation.getStatus()).thenReturn(Reservation.ReservationStatus.OPENED);
         when(reservationRepository.load(addProductCommand.getOrderId())).thenReturn(reservation);
 
         addProductCommandHandler.handle(addProductCommand);
